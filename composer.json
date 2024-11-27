@@ -2,6 +2,7 @@
     "name": "aliirfaan/citronel-external-service-generator",
     "description": "Generate configuration and classes to consume an external service. Use in conjuction with aliirfaan/citronel-external-service",
     "type": "library",
+    "license": "MIT",
     "authors": [
         {
             "name": "aliirfaan",
