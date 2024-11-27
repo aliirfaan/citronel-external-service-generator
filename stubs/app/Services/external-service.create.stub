@@ -1,0 +1,262 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Support\Facades\Http;
+use aliirfaan\CitronelExternalService\Contracts\AbstractExternalService;
+use aliirfaan\CitronelExternalService\Traits\ExternalServiceLogTrait;
+use aliirfaan\CitronelExternalService\Traits\ExternalServiceCacheTrait;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\TooManyRedirectsException;
+use Illuminate\Http\Client\ClientException;
+use Illuminate\Http\Client\ServerException;
+
+/**
+ * You should normally have a main service for the external platform
+ * Create a service for each endpoint that extends the main service
+ */
+class DummyClass extends AbstractExternalService
+{
+    use ExternalServiceLogTrait, ExternalServiceCacheTrait;
+    
+    public $configKey = '{{ config-key }}';
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // @todo
+        $this->mainProcess = '{{ external_service_main_process_name }}';
+
+        // @todo
+        $this->subProcess = 'get_ip';
+
+        // @todo
+        $this->setEndpoint('ip_endpoint');
+
+        // @todo set success code
+        $this->successCode = 200;
+
+        // @todo set additional request params for logging purposes
+        $this->integrationResponseParams = array_merge($this->integrationResponseParams, [
+            'example_request_data' => null,
+        ]);
+
+        // @todo set additional response params for logging purposes
+        $this->integrationResponseParams = array_merge($this->integrationResponseParams, [
+            'example_response_data' => null,
+        ]);
+    }
+
+    public function sendServiceRequest($correlationToken = null, $body = [])
+    {
+        $data = [
+            'success' => false,
+            'result' => null,
+            'errors' => null,
+            'message' => null,
+            'issues' => [],
+        ];
+        $request = null;
+        $processExtra = [];
+
+        $this->legCorrelationToken = 'uuid'; // @todo
+        $processExtra['leg_correlation_token'] = $this->legCorrelationToken;
+
+        $this->correlationToken = $correlationToken;
+
+        try {
+            // return cached response if available
+            $getCachedResponseResult = $this->getCachedResponse();
+            if (!is_null($getCachedResponseResult)) {
+                return $getCachedResponseResult;
+            }
+
+            $requestUrl = $this->baseUrl . $this->endpoint['endpoint'];
+
+            $data['result']['request']['integration']['url'] = $requestUrl;
+            $data['result']['request']['integration']['correlation_token'] = $this->correlationToken;
+            $data['result']['request']['integration']['leg_correlation_token'] = $this->legCorrelationToken;
+
+            // dispatch event
+            $this->dispatchRequestSentEvent($data);
+            
+            // remove sensitive data
+            $data = $this->removeIntegrationRequestParams($data);
+
+            $request = Http::connectTimeout($this->connectTimeoutSeconds)
+            ->timeout($this->timeoutSeconds)
+            ->accept($this->acceptContentType)
+            ->send($this->endpoint['method'], $requestUrl)
+            ->throw();
+            
+        } catch (ClientException $e) {
+            report($e);
+
+        } catch (ServerException $e) {
+            report($e);
+
+        } catch (TooManyRedirectsException  $e) {
+            report($e);
+
+            // @todo handle
+            $code = null;
+            $exceptionMessage = 'a message';
+
+            $processExtra = array_merge(
+                $processExtra,
+                [
+                    'exception' => [
+                        'message' => $exceptionMessage
+                    ]
+                ]
+            );
+        } catch (ConnectionException  $e) {
+            report($e);
+
+            // @todo handle
+            $code = null;
+            $exceptionMessage = 'a message';
+
+            $processExtra = array_merge(
+                $processExtra,
+                [
+                    'exception' => [
+                        'message' => $exceptionMessage
+                    ]
+                ]
+            );
+        } catch (\Exception $e) { // any other errors
+            report($e);
+
+            // @todo handle
+            $code = null;
+            $exceptionMessage = 'a message';
+
+            $processExtra = array_merge(
+                $processExtra,
+                [
+                    'exception' => [
+                        'message' => $exceptionMessage
+                    ]
+                ]
+            );
+        }
+
+        $processResponse = $this->processServiceResponse($request, $processExtra);
+        $data = array_replace_recursive($data, $processResponse);
+
+        return $data;
+    }
+    
+    /**
+     * Method processServiceResponse
+     *
+     * @param mixed $response [explicite description]
+     * @param array $extra [explicite description]
+     *
+     * @return array
+     */
+    public function processServiceResponse($response = null, $extra = [])
+    {
+        $data = [
+            'success' => false,
+            'result' => null,
+            'errors' => null,
+            'message' => null,
+            'issues' => [],
+        ];
+
+        $data['result']['response']['integration'] = $this->integrationResponseParams;
+
+        // set response correlation early to be able to trace in case of failure
+        $data['result']['response']['integration']['correlation_token'] = $this->correlationToken;
+
+        $data['result']['response']['integration']['leg_correlation_token'] = $this->legCorrelationToken;
+
+        $this->rawResponse = !is_null($response) ? (string) $response->getBody() : null;
+        $data['result']['response']['integration']['raw'] = $this->rawResponse;
+
+        $this->httpStatus  = !is_null($response) ? $response->getStatusCode() : null;
+        $data['result']['response']['integration']['http_status'] = $this->httpStatus;
+
+        $this->logToChannel();
+
+        // handle empty response
+        if (empty($response)) {
+            $data['errors'] = true;
+
+            // @todo
+            $code = null;
+            $data['message'] = null;
+        }
+
+        // handle exceptions other than client and server exceptions
+        if (is_null($data['errors']) && array_key_exists('exception', $extra)) {
+            $data['errors'] = true;
+            $data['message'] = $extra['exception']['message'];
+        }
+
+        // // handle client and server errors
+        if (is_null($data['errors'])) {
+            $responseBody = json_decode($this->rawResponse, true);
+            // @todo check response success based on api
+            $responseCode = $response->getStatusCode();
+            $data['result']['response']['integration']['response_code'] = $responseCode;
+            if (intval($responseCode) !== $this->successCode) {
+                $data['errors'] = true;
+                // @todo, create process error for endpoint if format is not the same as the general error
+                $processErrorResponse = $this->processGeneralError($response);
+                $data = array_replace_recursive($data, $processErrorResponse);
+            }
+
+            if (is_null($data['errors'])) {
+                $data['success'] = true;
+                $data['result']['data'] = $responseBody;
+                $data['result']['response']['integration']['success'] = true;
+
+                // @todo include endpoint specific response params
+                $data['result']['response']['integration']['origin'] = $responseBody['origin'] ?? null;
+            }
+        }
+
+        $this->dispatchResponseReceivedEvent($data);
+
+        // remove sensitive data
+        $data = $this->removeIntegrationResponseParams($data);
+
+        if (is_null($data['errors'])) {
+            $this->cacheResponse($data);
+        }
+
+        return $data;
+    }
+
+    public function processGeneralError($response = null, $extra = [])
+    {
+        $data = [
+            'success' => false,
+            'result' => null,
+            'errors' => null,
+            'message' => null,
+            'issues' => [],
+        ];
+        
+        $data['errors'] = true;
+
+        $responseBody = json_decode($this->rawResponse, true);
+
+        $subProcessKey = $extra['sub_process_key'] ?? null;
+
+        $eventKey = $extra['event_key'] ?? null;
+
+        // @todo include endpoint specific error response params
+        $data['result']['response']['integration']['origin'] = $responseBody['origin'] ?? null;
+
+        // @todo
+        $code = null;
+        $data['message'] = null;
+
+        return $data;
+    }
+}

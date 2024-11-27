@@ -1,0 +1,84 @@
+<?php
+/*
+| web_service
+| connect_timeout_seconds | int
+| Connection timeout in seconds
+|
+| timeout_seconds | int
+| Request timeout in seconds
+|
+| endpoints | array
+| Specific endpoints for the web service
+|
+| logging
+| should_log | bool
+| Global flag to enable or disable logging for this service
+|
+| caching
+| should_cache | bool
+| Global flag to enable or disable caching for this service
+|
+| pruning
+| should_prune | bool
+| Global flag to enable or disable pruning for this service
+*/
+return [
+    'web_service' => [
+        'base_url' => env('{{ external_service_name }}_BASE_URL'),
+        'connect_timeout_seconds' => env('{{ external_service_name }}_CONNECT_TIMEOUT_SECONDS', 10),
+        'timeout_seconds' => env('{{ external_service_name }}_TIMEOUT_SECONDS', 60),
+        'username' => env('{{ external_service_name }}_USERNAME'),
+        'password' => env('{{ external_service_name }}_PASSWORD'),
+        'api_key' => env('{{ external_service_name }}_KEY'),
+        'endpoints' => [
+            'ip_endpoint' => [
+                'api_operation' => 'ip',
+                'endpoint' => '/example-endpoint',
+                'method' => 'GET',
+                'logging' => [ // this will override the global logging settings and can be omitted if not needed
+                    'should_log' => env('{{ external_service_name }}_SHOULD_LOG'),
+                    'requests' => [
+                        'should_log' => env('{{ external_service_name }}_SHOULD_LOG_REQUESTS'),
+                    ],
+                    'responses' => [
+                        'should_log' => env('{{ external_service_name }}_SHOULD_LOG_RESPONSES'),
+                        'log_channel' => env('{{ external_service_name }}_LOG_RESPONSE_CHANNEL'),
+                    ]
+                ],
+                'caching' => [
+                    'should_cache' => env('{{ external_service_name }}_SHOULD_CACHE'),
+                    'cache_key' => '{{ external_service_name }}_example',
+                    'cache_seconds' => env('{{ external_service_name }}_CACHE_EXAMPLE_ENDPOINT_SEC', 3600),
+                ]
+            ]
+        ],
+    ],
+    'logging' => [
+        'should_log' => env('{{ external_service_name }}_SHOULD_LOG', false),
+        'requests' => [
+            'should_log' => env('{{ external_service_name }}_SHOULD_LOG_REQUESTS', true),
+            'event_class' => env('{{ external_service_name }}_LOG_REQUEST_EVENT_CLASS', App\Events\Test::class),
+            'model' => env('{{ external_service_name }}_LOG_REQUEST_MODEL', App\Models\Request::class),
+        ],
+        'responses' => [
+            'should_log' => env('{{ external_service_name }}_SHOULD_LOG_RESPONSES', true),
+            'event_class' => env('{{ external_service_name }}_LOG_RESPONSE_EVENT_CLASS', App\Events\Test::class),
+            'model' => env('{{ external_service_name }}_LOG_RESPONSE_MODEL', App\Models\Response::class),
+            'log_response_channel' => env('{{ external_service_name }}_LOG_RESPONSE_CHANNEL', '{{ external_service_name }}_response', null),
+        ],
+    ],
+    'caching' => [
+        'should_cache' => env('{{ external_service_name }}_SHOULD_CACHE', false),
+    ],
+    'pruning' => [
+        'should_prune' => env('{{ external_service_name }}_SHOULD_PRUNE', true),
+        'requests' => [
+            'should_prune' => env('{{ external_service_name }}_SHOULD_PRUNE_REQUESTS', true),
+            'prune_days' => env('{{ external_service_name }}_PRUNE_REQUESTS_DAYS', 60),
+        ],
+        'responses' => [
+            'should_prune' => env('{{ external_service_name }}_SHOULD_PRUNE_RESPONSES', true),
+            'prune_days' => env('{{ external_service_name }}_PRUNE_RESPONSES_DAYS', 60),
+        ]
+    ]
+];

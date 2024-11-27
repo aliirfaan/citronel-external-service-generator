@@ -1,0 +1,19 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use aliirfaan\CitronelExternalService\Traits\ExternalServiceLogTrait;
+use aliirfaan\CitronelExternalService\Traits\ExternalServiceEventSubscriberTrait;
+
+class DummyClass
+{
+    use ExternalServiceLogTrait, ExternalServiceEventSubscriberTrait;
+
+    public function __construct()
+    {
+        $this->configKey = '{{ config-key }}';
+        $this->setIntegrationLogConfig();
+    }
+}

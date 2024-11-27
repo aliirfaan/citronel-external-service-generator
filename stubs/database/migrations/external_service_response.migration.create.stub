@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('{{ table }}', function (Blueprint $table) {
+            $table->id();
+            $table->string('correlation_token')->nullable(true);
+            $table->string('leg_correlation_token')->nullable(true);
+            $table->text('http_status')->nullable(true);
+            $table->text('raw')->nullable(true);
+
+            // @todo add additional columns
+
+            $table->timestamps();
+
+            $table->index('correlation_token');
+            $table->index('leg_correlation_token');
+            $table->index('http_status');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('{{ table }}');
+    }
+};

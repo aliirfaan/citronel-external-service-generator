@@ -1,0 +1,28 @@
+{
+    "name": "aliirfaan/citronel-external-service-generator",
+    "description": "Generate configuration and classes to consume an external service. Use in conjuction with aliirfaan/citronel-external-service",
+    "type": "library",
+    "authors": [
+        {
+            "name": "aliirfaan",
+            "email": "aliirfaan.freelance@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "aliirfaan\\CitronelExternalServiceGenerator\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.0.0",
+        "laravel/framework": ">=11.0",
+        "aliirfaan/citronel-external-service": "^1.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "aliirfaan\\CitronelExternalServiceGenerator\\CitronelExternalServiceGeneratorProvider"
+            ]
+        }
+    }
+}

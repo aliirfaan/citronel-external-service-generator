@@ -1,0 +1,33 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Database\Eloquent\Model;
+use aliirfaan\CitronelExternalService\Traits\ExternalServiceLogTrait;
+use Illuminate\Database\Eloquent\MassPrunable;
+
+class DummyClass extends Model
+{
+    use MassPrunable, ExternalServiceLogTrait;
+
+    // @todo add custom fields
+    protected $fillable = [];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->configKey = '{{ config-key }}';
+
+        $this->mergeFillable($this->integrationResponseParams);
+
+        $this->setIntegrationLogConfig();
+    }
+
+    public function prunable()
+    {
+        if ($this->shouldPruneResponses) {
+            return static::where('created_at', '<=', now()->subDays(intval($this->pruneResponseDays)));
+        }
+    }
+}

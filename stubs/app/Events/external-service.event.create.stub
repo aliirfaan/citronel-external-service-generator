@@ -1,0 +1,12 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+use aliirfaan\CitronelExternalService\Traits\ExternalServiceEventTrait;
+
+class DummyClass
+{
+    use Dispatchable, SerializesModels, ExternalServiceEventTrait;
+}
