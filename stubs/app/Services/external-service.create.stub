@@ -7,9 +7,7 @@ use aliirfaan\CitronelExternalService\Contracts\AbstractExternalService;
 use aliirfaan\CitronelExternalService\Traits\ExternalServiceLogTrait;
 use aliirfaan\CitronelExternalService\Traits\ExternalServiceCacheTrait;
 use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\TooManyRedirectsException;
-use Illuminate\Http\Client\ClientException;
-use Illuminate\Http\Client\ServerException;
+use Illuminate\Http\Client\RequestException;
 
 /**
  * You should normally have a main service for the external platform
@@ -90,27 +88,23 @@ class DummyClass extends AbstractExternalService
             ->send($this->endpoint['method'], $requestUrl)
             ->throw();
             
-        } catch (ClientException $e) {
+        } catch (RequestException $e) {
             report($e);
 
-        } catch (ServerException $e) {
-            report($e);
-
-        } catch (TooManyRedirectsException  $e) {
-            report($e);
-
-            // @todo handle
-            $code = null;
-            $exceptionMessage = 'a message';
-
-            $processExtra = array_merge(
-                $processExtra,
-                [
-                    'exception' => [
-                        'message' => $exceptionMessage
+            if ($e->response && $e->response->status() === 429) {
+                $code = null;
+                $exceptionMessage = 'a message';
+    
+                $processExtra = array_merge(
+                    $processExtra,
+                    [
+                        'exception' => [
+                            'message' => $exceptionMessage
+                        ]
                     ]
-                ]
-            );
+                );
+            }
+
         } catch (ConnectionException  $e) {
             report($e);
 
