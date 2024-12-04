@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com) and this p
 ### Fixed
 
 - config key should_cache to should log under logging key
+- use RequestException for http client
 
 ## 1.0.0 - 2024-10-14
 
