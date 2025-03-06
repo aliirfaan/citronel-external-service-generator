@@ -16,10 +16,10 @@ Generate configuration and classes to consume an external service that use the p
 
 ## Installation
 
-* Install the package using composer:
+* Install the package using composer as a dev requirement:
 
 ```bash
- $ composer require aliirfaan/citronel-external-service-generator
+ $ composer require aliirfaan/citronel-external-service-generator --dev
 ```
 
 ## Usage
@@ -109,7 +109,9 @@ return [
 ```bash
  $ php artisan citronel:external-service-generate:log --log_type=request HttpBinPlatform/HttpBinPlatformReq http-bin
 ```
-* Add your custom columns to the newly generated migration
+* Add your custom columns to the newly generated migration.
+
+* Update your config file with the newly model class.
 
 ### Generating external service response migration and model
 
@@ -118,9 +120,12 @@ return [
 ```bash
  $ php artisan citronel:external-service-generate:log --log_type=response HttpBinPlatform/HttpBinPlatformResp http-bin
 ```
-* Add your custom columns to the newly generated migration
+* Add your custom columns to the newly generated migration.
+
+* Update your config file with the newly model class.
 
 ### Run your newly generated migration to create tables
+You can run migration later if you do not know what fields to log.
 ```bash
  $ php artisan migrate
 ```
@@ -134,6 +139,7 @@ return [
 ```bash
  $ php artisan citronel:external-service-generate:event HttpBinPlatform/HttpBinPlatformRequestSent
 ```
+* Update your config file with the newly created event class.
 
 ### Generating external service response event
 
@@ -142,6 +148,7 @@ return [
 ```bash
  $ php artisan citronel:external-service-generate:event HttpBinPlatform/HttpBinPlatformResponseReceived
 ```
+* Update your config file with the newly created event class.
 
 ## Listener
 
@@ -163,5 +170,9 @@ return [
 ```
 
 ## aliirfaan/citronel-external-service
+* Install the package aliirfaan/citronel-external-service-generator if you have not already done so:
 
+```bash
+ $ composer require aliirfaan/citronel-external-service
+```
 * See documentation of `aliirfaan/citronel-external-service` package on how to use newly generated classes.
