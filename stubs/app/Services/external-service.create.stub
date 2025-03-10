@@ -78,9 +78,13 @@ class DummyClass extends AbstractExternalService
 
             $requestUrl = $this->baseUrl . $this->endpoint['endpoint'];
 
-            $data['result']['request']['integration']['url'] = $requestUrl;
-            $data['result']['request']['integration']['correlation_token'] = $this->correlationToken;
-            $data['result']['request']['integration']['leg_correlation_token'] = $this->legCorrelationToken;
+            $this->integrationRequestParams['url'] = $requestUrl;
+
+            $this->integrationRequestParams['correlation_token'] = $this->correlationToken;
+
+            $this->integrationRequestParams['leg_correlation_token'] = $this->legCorrelationToken;
+
+            $data['result']['request']['integration'] = $this->integrationRequestParams;
 
             // dispatch event
             $this->dispatchRequestSentEvent($data);
@@ -170,15 +174,15 @@ class DummyClass extends AbstractExternalService
         $data['result']['response']['integration'] = $this->integrationResponseParams;
 
         // set response correlation early to be able to trace in case of failure
-        $data['result']['response']['integration']['correlation_token'] = $this->correlationToken;
+        $this->integrationResponseParams['correlation_token'] = $this->correlationToken;
 
-        $data['result']['response']['integration']['leg_correlation_token'] = $this->legCorrelationToken;
+        $this->integrationResponseParams['leg_correlation_token'] = $this->legCorrelationToken;
 
         $this->rawResponse = !is_null($response) ? (string) $response->getBody() : null;
-        $data['result']['response']['integration']['raw'] = $this->rawResponse;
+        $this->integrationResponseParams['raw'] = $this->rawResponse;
 
         $this->httpStatus  = !is_null($response) ? $response->getStatusCode() : null;
-        $data['result']['response']['integration']['http_status'] = $this->httpStatus;
+        $this->integrationResponseParams['http_status'] = $this->httpStatus;
 
         $this->logToChannel();
 
@@ -197,7 +201,7 @@ class DummyClass extends AbstractExternalService
             $data['message'] = $extra['exception']['message'];
         }
 
-        // // handle client and server errors
+        // handle client and server errors
         if (is_null($data['errors'])) {
             $responseBody = json_decode($this->rawResponse, true);
             // @todo check response success based on api
@@ -219,6 +223,8 @@ class DummyClass extends AbstractExternalService
                 $data['result']['response']['integration']['origin'] = $responseBody['origin'] ?? null;
             }
         }
+
+        $data['result']['response']['integration'] = $this->integrationResponseParams;
 
         $this->dispatchResponseReceivedEvent($data);
 
