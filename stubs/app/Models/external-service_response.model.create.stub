@@ -19,7 +19,7 @@ class DummyClass extends Model
 
         $this->configKey = '{{ config-key }}';
 
-        $this->mergeFillable($this->integrationResponseParams);
+        $this->mergeFillable(array_keys($this->integrationResponseParams));
 
         $this->setIntegrationLogConfig();
     }
