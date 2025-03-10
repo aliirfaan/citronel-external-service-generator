@@ -44,6 +44,12 @@ class DummyClass extends AbstractExternalService
         $this->integrationResponseParams = array_merge($this->integrationResponseParams, [
             'example_response_data' => null,
         ]);
+
+        $this->setIntegrationCacheConfig()
+
+        $this->setIntegrationLogConfig();
+
+        $this->setIntegrationPruneConfig();
     }
 
     public function sendServiceRequest($correlationToken = null, $body = [])
