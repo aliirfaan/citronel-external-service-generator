@@ -76,6 +76,8 @@ class DummyClass extends AbstractExternalService
                 return $getCachedResponseResult;
             }
 
+            $this->integrationRequestParams['api_operation'] = $this->endpoint['api_operation'];
+
             $requestUrl = $this->baseUrl . $this->endpoint['endpoint'];
 
             $this->integrationRequestParams['url'] = $requestUrl;

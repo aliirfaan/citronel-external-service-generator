@@ -109,7 +109,7 @@ return [
 ```bash
  $ php artisan citronel:external-service-generate:log --log_type=request HttpBinPlatform/HttpBinPlatformReq http-bin
 ```
-* Add your custom columns to the newly generated migration.
+* Add your custom columns to the newly generated migration based on data you want to log.
 
 * Update your config file with the newly model class.
 
@@ -120,7 +120,7 @@ return [
 ```bash
  $ php artisan citronel:external-service-generate:log --log_type=response HttpBinPlatform/HttpBinPlatformResp http-bin
 ```
-* Add your custom columns to the newly generated migration.
+* Add your custom columns to the newly generated migration based on data you want to log.
 
 * Update your config file with the newly model class.
 
