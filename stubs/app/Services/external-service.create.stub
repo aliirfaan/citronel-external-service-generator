@@ -17,10 +17,10 @@ class DummyClass extends AbstractExternalService
 {
     use ExternalServiceLogTrait, ExternalServiceCacheTrait;
     
-    public $configKey = '{{ config-key }}';
-
     public function __construct()
     {
+        $this->configKey = '{{ config-key }}';
+
         parent::__construct();
 
         // @todo
