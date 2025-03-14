@@ -39,7 +39,7 @@ class DummyClass extends AbstractExternalService
 
         $this->integrationRequestParams = $this->logRequestModel->integrationFields;
 
-        $this->integrationResponseParams = $this->logRequestModel->integrationFields;
+        $this->integrationResponseParams = $this->logResponseModel->integrationFields;
 
         $this->setIntegrationCacheConfig();
     }
