@@ -35,21 +35,13 @@ class DummyClass extends AbstractExternalService
         // @todo set success code
         $this->successCode = 200;
 
-        // @todo set additional request params for logging purposes
-        $this->integrationRequestParams = array_merge($this->integrationRequestParams, [
-            'example_request_data' => null,
-        ]);
-
-        // @todo set additional response params for logging purposes
-        $this->integrationResponseParams = array_merge($this->integrationResponseParams, [
-            'example_response_data' => null,
-        ]);
-
-        $this->setIntegrationCacheConfig()
-
         $this->setIntegrationLogConfig();
 
-        $this->setIntegrationPruneConfig();
+        $this->integrationRequestParams = $this->logRequestModel->integrationFields;
+
+        $this->integrationResponseParams = $this->logRequestModel->integrationFields;
+
+        $this->setIntegrationCacheConfig();
     }
 
     public function sendServiceRequest($correlationToken = null, $body = [])
