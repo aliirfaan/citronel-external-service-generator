@@ -10,8 +10,10 @@ class DummyClass extends Model
 {
     use MassPrunable, ExternalServiceLogTrait;
 
-    // @todo add custom fields
-    protected $fillable = [];
+    // @todo add service specific fields
+    public $integrationFields = [
+        'example_field' => null,
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -19,9 +21,10 @@ class DummyClass extends Model
 
         $this->configKey = '{{ config-key }}';
 
+        $this->integrationFields = array_merge($this->integrationFields, $this->integrationResponseParams);
         $this->mergeFillable(array_keys($this->integrationResponseParams));
 
-        $this->setIntegrationLogConfig();
+        $this->setIntegrationPruneConfig();
     }
 
     public function prunable()
