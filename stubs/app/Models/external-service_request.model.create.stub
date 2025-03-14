@@ -22,7 +22,7 @@ class DummyClass extends Model
         $this->configKey = '{{ config-key }}';
 
         $this->integrationFields = array_merge($this->integrationFields, $this->integrationRequestParams);
-        $this->mergeFillable(array_keys($this->integrationRequestParams));
+        $this->mergeFillable(array_keys($this->integrationFields));
 
         $this->setIntegrationPruneConfig();
     }
