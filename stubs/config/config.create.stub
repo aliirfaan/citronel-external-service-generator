@@ -64,7 +64,7 @@ return [
             'should_log' => env('{{ external_service_name }}_SHOULD_LOG_RESPONSES', true),
             'event_class' => env('{{ external_service_name }}_LOG_RESPONSE_EVENT_CLASS', App\Events\Test::class),
             'model' => env('{{ external_service_name }}_LOG_RESPONSE_MODEL', App\Models\Response::class),
-            'log_response_channel' => env('{{ external_service_name }}_LOG_RESPONSE_CHANNEL', '{{ external_service_name }}_response', null),
+            'log_response_channel' => env('{{ external_service_name }}_LOG_RESPONSE_CHANNEL', null),
         ],
     ],
     'caching' => [
