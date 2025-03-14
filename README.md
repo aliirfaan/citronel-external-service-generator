@@ -159,6 +159,29 @@ You can run migration later if you do not know what fields to log.
 ```bash
  $ php artisan citronel:external-service-generate:listener HttpBinPlatform/HttpBinPlatformEventSubscriber http-bin
 ```
+* Register event subscriber
+
+```php
+<?php
+
+namespace App\Providers;
+
+use App\Listeners\HttpBinPlatformEventSubscriber;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        Event::subscribe(HttpBinPlatformEventSubscriber::class);
+    }
+}
+```
+
 ## Service
 
 ### Generating service clas
