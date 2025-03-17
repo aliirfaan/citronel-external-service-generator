@@ -193,7 +193,7 @@ class AppServiceProvider extends ServiceProvider
 ```
 
 ## aliirfaan/citronel-external-service
-* Install the package aliirfaan/citronel-external-service-generator if you have not already done so:
+* Install the package aliirfaan/citronel-external-service if you have not already done so:
 
 ```bash
  $ composer require aliirfaan/citronel-external-service
