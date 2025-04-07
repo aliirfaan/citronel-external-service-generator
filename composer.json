@@ -16,7 +16,8 @@
     },
     "require": {
         "php": ">=8.0.0",
-        "laravel/framework": ">=11.0"
+        "laravel/framework": ">=11.0",
+        "aliirfaan/citronel-external-service": "^1.0"
     },
     "extra": {
         "laravel": {
